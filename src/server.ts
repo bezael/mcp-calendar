@@ -17,7 +17,7 @@ import { MCPCalendarError } from './utils/errors.js';
 import { logger } from './utils/logger.js';
 
 const app: Express = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
 app.use(cors());
@@ -210,8 +210,10 @@ app.use((err: Error, _req: Request, res: Response, _next: express.NextFunction) 
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  logger.info(`Servidor HTTP iniciado en puerto ${PORT}`);
-  logger.info(`Health check: http://localhost:${PORT}/health`);
+// Escuchar en 0.0.0.0 para que Railway pueda enrutar el tráfico
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  logger.info(`Servidor HTTP iniciado en ${HOST}:${PORT}`);
+  logger.info(`Health check disponible en /health`);
 });
 
