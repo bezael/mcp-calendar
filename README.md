@@ -79,6 +79,24 @@ npm run build
 npm start
 ```
 
+## 🚂 Despliegue en Railway
+
+Este proyecto puede desplegarse como API REST en Railway. Consulta la [guía completa de despliegue](RAILWAY_DEPLOY.md) para instrucciones detalladas.
+
+**Resumen rápido:**
+1. Conecta tu repositorio a Railway
+2. Configura las variables de entorno (Google OAuth2 o Service Account)
+3. Railway construirá y desplegará automáticamente
+4. Accede a tu API en la URL proporcionada por Railway
+
+**Endpoints disponibles:**
+- `GET /health` - Health check
+- `POST /api/events` - Crear evento
+- `GET /api/events/:eventId` - Obtener evento
+- `GET /api/events` - Listar eventos
+- `PUT /api/events/:eventId` - Actualizar evento
+- `DELETE /api/events/:eventId` - Eliminar evento
+
 ## 🔌 Integración con Cursor/Claude
 
 Añade el servidor a tu configuración de MCP. En Cursor, añade al archivo `~/.cursor/mcp.json`:
