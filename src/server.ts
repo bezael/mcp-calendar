@@ -29,7 +29,7 @@ app.use(cors());
 app.use(express.json());
 
 // Root endpoint
-app.get('/', (_req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response): void => {
   res.json({ 
     status: 'ok', 
     service: 'mcp-gcal-api',
@@ -45,9 +45,23 @@ app.get('/', (_req: Request, res: Response) => {
   });
 });
 
-// Health check endpoint
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({ status: 'ok', service: 'mcp-gcal-api', timestamp: new Date().toISOString() });
+// Health check endpoint - Railway usa esto para verificar que el servidor está listo
+app.get('/health', (_req: Request, res: Response): void => {
+  res.status(200).json({ 
+    status: 'ok', 
+    service: 'mcp-gcal-api', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// Readiness probe - Endpoint adicional para verificar que el servidor está completamente listo
+app.get('/ready', (_req: Request, res: Response): void => {
+  res.status(200).json({ 
+    status: 'ready', 
+    service: 'mcp-gcal-api',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // POST /api/events - Crear evento
