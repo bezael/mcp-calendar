@@ -1,25 +1,56 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    // Target y módulos - Configuración moderna para Node.js 20+
+    "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
+    "lib": ["ESNext"],
+    
+    // Output
     "outDir": "./dist",
     "rootDir": "./src",
+    
+    // Type checking - Strict mode completo
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    
+    // Características modernas de TypeScript 5.0+
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    
+    // Calidad de código
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    
+    // Interoperabilidad de módulos
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    
+    // Generación de archivos
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
+    
+    // Rendimiento
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "skipLibCheck": true,
+    
+    // Validaciones adicionales
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
 

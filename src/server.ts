@@ -51,15 +51,16 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // POST /api/events - Crear evento
-app.post('/api/events', async (req: Request, res: Response) => {
+app.post('/api/events', async (req: Request, res: Response): Promise<void> => {
   try {
     const { summary, description, location, start, end, calendarId, timeZone, attendees } = req.body;
 
     if (!summary || !start || !end) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'validation_error',
         message: 'Los campos summary, start y end son requeridos'
       });
+      return;
     }
 
     const result = await createEvent({
@@ -89,10 +90,18 @@ app.post('/api/events', async (req: Request, res: Response) => {
 });
 
 // GET /api/events/:eventId - Obtener evento
-app.get('/api/events/:eventId', async (req: Request, res: Response) => {
+app.get('/api/events/:eventId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { eventId } = req.params;
+    const eventId = req.params.eventId;
     const { calendarId } = req.query;
+
+    if (!eventId) {
+      res.status(400).json({
+        error: 'validation_error',
+        message: 'El parámetro eventId es requerido'
+      });
+      return;
+    }
 
     const result = await getEvent({
       eventId,
@@ -117,15 +126,16 @@ app.get('/api/events/:eventId', async (req: Request, res: Response) => {
 });
 
 // GET /api/events - Listar eventos
-app.get('/api/events', async (req: Request, res: Response) => {
+app.get('/api/events', async (req: Request, res: Response): Promise<void> => {
   try {
     const { timeMin, timeMax, maxResults, calendarId, q } = req.query;
 
     if (!timeMin || !timeMax) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'validation_error',
         message: 'Los parámetros timeMin y timeMax son requeridos'
       });
+      return;
     }
 
     const result = await listEvents({
@@ -152,10 +162,18 @@ app.get('/api/events', async (req: Request, res: Response) => {
 });
 
 // PUT /api/events/:eventId - Actualizar evento
-app.put('/api/events/:eventId', async (req: Request, res: Response) => {
+app.put('/api/events/:eventId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { eventId } = req.params;
+    const eventId = req.params.eventId;
     const { summary, description, location, start, end, calendarId, timeZone, attendees } = req.body;
+
+    if (!eventId) {
+      res.status(400).json({
+        error: 'validation_error',
+        message: 'El parámetro eventId es requerido'
+      });
+      return;
+    }
 
     const result = await updateEvent({
       eventId,
@@ -187,10 +205,18 @@ app.put('/api/events/:eventId', async (req: Request, res: Response) => {
 });
 
 // DELETE /api/events/:eventId - Eliminar evento
-app.delete('/api/events/:eventId', async (req: Request, res: Response) => {
+app.delete('/api/events/:eventId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { eventId } = req.params;
+    const eventId = req.params.eventId;
     const { calendarId } = req.query;
+
+    if (!eventId) {
+      res.status(400).json({
+        error: 'validation_error',
+        message: 'El parámetro eventId es requerido'
+      });
+      return;
+    }
 
     await deleteEvent({
       eventId,
