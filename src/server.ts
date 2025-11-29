@@ -4,6 +4,11 @@
  * Expone los endpoints del MCP como API REST para despliegue en Railway
  */
 
+// Mensaje de inicio inmediato para diagnóstico
+console.log('🚀 Iniciando servidor MCP Calendar API...');
+console.log(`📦 Node version: ${process.version}`);
+console.log(`📁 Working directory: ${process.cwd()}`);
+
 import cors from 'cors';
 import 'dotenv/config';
 import express, { type Express, type Request, type Response } from 'express';
@@ -23,9 +28,26 @@ const PORT = Number(process.env.PORT) || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Root endpoint
+app.get('/', (_req: Request, res: Response) => {
+  res.json({ 
+    status: 'ok', 
+    service: 'mcp-gcal-api',
+    version: '0.1.0',
+    endpoints: {
+      health: '/health',
+      createEvent: 'POST /api/events',
+      getEvent: 'GET /api/events/:eventId',
+      listEvents: 'GET /api/events',
+      updateEvent: 'PUT /api/events/:eventId',
+      deleteEvent: 'DELETE /api/events/:eventId'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (_req: Request, res: Response) => {
-  res.json({ status: 'ok', service: 'mcp-gcal-api' });
+  res.json({ status: 'ok', service: 'mcp-gcal-api', timestamp: new Date().toISOString() });
 });
 
 // POST /api/events - Crear evento
@@ -213,11 +235,30 @@ app.use((err: Error, _req: Request, res: Response, _next: express.NextFunction) 
 // Escuchar en 0.0.0.0 para que Railway pueda enrutar el tráfico
 const HOST = process.env.HOST || '0.0.0.0';
 
-const server = app.listen(PORT, HOST, () => {
-  logger.info(`Servidor HTTP iniciado en ${HOST}:${PORT}`);
-  logger.info(`Health check disponible en /health`);
-  console.log(`✅ Servidor escuchando en http://${HOST}:${PORT}`);
-});
+// Validar que el puerto sea válido
+if (isNaN(PORT) || PORT <= 0 || PORT > 65535) {
+  logger.error('Puerto inválido', { port: PORT });
+  console.error(`❌ Puerto inválido: ${PORT}`);
+  process.exit(1);
+}
+
+logger.info('Iniciando servidor HTTP...', { host: HOST, port: PORT });
+console.log(`🚀 Iniciando servidor en ${HOST}:${PORT}...`);
+
+let server: ReturnType<typeof app.listen>;
+
+try {
+  server = app.listen(PORT, HOST, () => {
+    logger.info(`Servidor HTTP iniciado exitosamente`, { host: HOST, port: PORT });
+    logger.info(`Health check disponible en /health`);
+    console.log(`✅ Servidor escuchando en http://${HOST}:${PORT}`);
+    console.log(`✅ Health check: http://${HOST}:${PORT}/health`);
+  });
+} catch (error) {
+  logger.error('Error al crear el servidor', { error: error instanceof Error ? error.message : String(error) });
+  console.error('❌ Error al crear el servidor:', error);
+  process.exit(1);
+}
 
 // Manejo de errores del servidor
 server.on('error', (error: NodeJS.ErrnoException) => {
@@ -231,16 +272,63 @@ server.on('error', (error: NodeJS.ErrnoException) => {
   process.exit(1);
 });
 
+// Manejo de cierre graceful
+server.on('close', () => {
+  logger.info('Servidor cerrado');
+  console.log('👋 Servidor cerrado');
+});
+
 // Manejo de errores no capturados
 process.on('uncaughtException', (error: Error) => {
   logger.error('Excepción no capturada', { error: error.message, stack: error.stack });
   console.error('❌ Excepción no capturada:', error);
-  process.exit(1);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
 });
 
 process.on('unhandledRejection', (reason: unknown) => {
   logger.error('Promesa rechazada no manejada', { reason: String(reason) });
   console.error('❌ Promesa rechazada no manejada:', reason);
-  process.exit(1);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
+
+// Manejo de señales para cierre graceful (importante para Railway)
+process.on('SIGTERM', () => {
+  logger.info('Recibida señal SIGTERM, cerrando servidor...');
+  console.log('🛑 Recibida señal SIGTERM, cerrando servidor...');
+  if (server) {
+    server.close(() => {
+      logger.info('Servidor cerrado correctamente');
+      console.log('✅ Servidor cerrado correctamente');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});
+
+process.on('SIGINT', () => {
+  logger.info('Recibida señal SIGINT, cerrando servidor...');
+  console.log('🛑 Recibida señal SIGINT, cerrando servidor...');
+  if (server) {
+    server.close(() => {
+      logger.info('Servidor cerrado correctamente');
+      console.log('✅ Servidor cerrado correctamente');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
 });
 
