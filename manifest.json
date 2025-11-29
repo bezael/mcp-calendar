@@ -1,0 +1,166 @@
+{
+  "name": "mcp-gcal",
+  "version": "0.1.0",
+  "description": "MCP server for interacting with Google Calendar (create, list, get, update, delete events)",
+  "command": "node",
+  "args": ["dist/index.js"],
+  "tools": [
+    {
+      "name": "create_event",
+      "description": "Crea un nuevo evento en Google Calendar",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "Título del evento (requerido)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción del evento"
+          },
+          "location": {
+            "type": "string",
+            "description": "Ubicación del evento"
+          },
+          "start": {
+            "type": "string",
+            "description": "Fecha/hora de inicio en formato ISO 8601 (ej: 2025-11-30T10:00:00+01:00)"
+          },
+          "end": {
+            "type": "string",
+            "description": "Fecha/hora de fin en formato ISO 8601"
+          },
+          "calendarId": {
+            "type": "string",
+            "description": "ID del calendario (por defecto: primary o GOOGLE_CALENDAR_ID)"
+          },
+          "timeZone": {
+            "type": "string",
+            "description": "Zona horaria (por defecto: Europe/Madrid)"
+          },
+          "attendees": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Lista de emails de los asistentes"
+          }
+        },
+        "required": ["summary", "start", "end"]
+      }
+    },
+    {
+      "name": "get_event",
+      "description": "Obtiene un evento por su ID",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "description": "ID del evento a obtener (requerido)"
+          },
+          "calendarId": {
+            "type": "string",
+            "description": "ID del calendario (por defecto: primary)"
+          }
+        },
+        "required": ["eventId"]
+      }
+    },
+    {
+      "name": "list_events",
+      "description": "Lista eventos en un rango de fechas",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "timeMin": {
+            "type": "string",
+            "description": "Fecha/hora mínima en formato ISO 8601 (requerido)"
+          },
+          "timeMax": {
+            "type": "string",
+            "description": "Fecha/hora máxima en formato ISO 8601 (requerido)"
+          },
+          "maxResults": {
+            "type": "number",
+            "description": "Número máximo de resultados (por defecto: 50)"
+          },
+          "calendarId": {
+            "type": "string",
+            "description": "ID del calendario (por defecto: primary)"
+          },
+          "q": {
+            "type": "string",
+            "description": "Texto de búsqueda para filtrar eventos"
+          }
+        },
+        "required": ["timeMin", "timeMax"]
+      }
+    },
+    {
+      "name": "update_event",
+      "description": "Actualiza parcialmente un evento existente",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "description": "ID del evento a actualizar (requerido)"
+          },
+          "calendarId": {
+            "type": "string",
+            "description": "ID del calendario (por defecto: primary)"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Nuevo título del evento"
+          },
+          "description": {
+            "type": "string",
+            "description": "Nueva descripción"
+          },
+          "location": {
+            "type": "string",
+            "description": "Nueva ubicación"
+          },
+          "start": {
+            "type": "string",
+            "description": "Nueva fecha/hora de inicio en formato ISO 8601"
+          },
+          "end": {
+            "type": "string",
+            "description": "Nueva fecha/hora de fin en formato ISO 8601"
+          },
+          "timeZone": {
+            "type": "string",
+            "description": "Nueva zona horaria"
+          },
+          "attendees": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Nueva lista de emails de asistentes"
+          }
+        },
+        "required": ["eventId"]
+      }
+    },
+    {
+      "name": "delete_event",
+      "description": "Elimina un evento del calendario",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "description": "ID del evento a eliminar (requerido)"
+          },
+          "calendarId": {
+            "type": "string",
+            "description": "ID del calendario (por defecto: primary)"
+          }
+        },
+        "required": ["eventId"]
+      }
+    }
+  ]
+}
+
