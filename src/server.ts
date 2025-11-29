@@ -212,8 +212,35 @@ app.use((err: Error, _req: Request, res: Response, _next: express.NextFunction) 
 // Iniciar servidor
 // Escuchar en 0.0.0.0 para que Railway pueda enrutar el tráfico
 const HOST = process.env.HOST || '0.0.0.0';
-app.listen(PORT, HOST, () => {
+
+const server = app.listen(PORT, HOST, () => {
   logger.info(`Servidor HTTP iniciado en ${HOST}:${PORT}`);
   logger.info(`Health check disponible en /health`);
+  console.log(`✅ Servidor escuchando en http://${HOST}:${PORT}`);
+});
+
+// Manejo de errores del servidor
+server.on('error', (error: NodeJS.ErrnoException) => {
+  logger.error('Error al iniciar el servidor', { error: error.message, code: error.code });
+  console.error('❌ Error al iniciar el servidor:', error.message);
+  
+  if (error.code === 'EADDRINUSE') {
+    console.error(`⚠️  El puerto ${PORT} ya está en uso`);
+  }
+  
+  process.exit(1);
+});
+
+// Manejo de errores no capturados
+process.on('uncaughtException', (error: Error) => {
+  logger.error('Excepción no capturada', { error: error.message, stack: error.stack });
+  console.error('❌ Excepción no capturada:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason: unknown) => {
+  logger.error('Promesa rechazada no manejada', { reason: String(reason) });
+  console.error('❌ Promesa rechazada no manejada:', reason);
+  process.exit(1);
 });
 
